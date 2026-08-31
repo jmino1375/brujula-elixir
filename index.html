@@ -432,8 +432,8 @@
           <p class="card-eyebrow">Índice general</p>
           <h2 class="card-title">Madurez de gestión cultural</h2>
           <div class="idx-row">
-            <span class="idx-value" id="idx-value">0.00</span>
-            <span class="idx-of">/ 5.00</span>
+            <span class="idx-value" id="idx-value">0%</span>
+            <span class="idx-of">de madurez</span>
           </div>
           <span class="idx-badge" id="idx-badge">Nivel</span>
           <div class="gauge">
@@ -448,11 +448,11 @@
         <div class="card">
           <p class="card-eyebrow">Palanca dominante</p>
           <h2 class="card-title">Mindset vs. Método</h2>
-          <svg class="balance-fig" viewBox="0 0 300 172" role="img" aria-labelledby="balance-desc">
+          <svg class="balance-fig" viewBox="0 0 300 205" role="img" aria-labelledby="balance-desc">
             <desc id="balance-desc">Balanza que se inclina hacia el lado con mayor puntaje promedio entre los ítems de mindset y los ítems de método.</desc>
-            <polygon points="130,150 170,150 150,112" fill="none" stroke="var(--ink-muted)" stroke-width="2" stroke-linejoin="round"/>
-            <line x1="150" y1="150" x2="150" y2="158" stroke="var(--ink-muted)" stroke-width="2"/>
-            <line x1="128" y1="158" x2="172" y2="158" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round"/>
+            <polygon points="130,138 170,138 150,100" fill="none" stroke="var(--ink-muted)" stroke-width="2" stroke-linejoin="round"/>
+            <line x1="150" y1="138" x2="150" y2="146" stroke="var(--ink-muted)" stroke-width="2"/>
+            <line x1="128" y1="146" x2="172" y2="146" stroke="var(--ink-muted)" stroke-width="2" stroke-linecap="round"/>
             <g id="beam-group" stroke-linecap="round">
               <line id="beam-line" x1="55" y1="112" x2="245" y2="112" stroke="var(--ink)" stroke-width="3"/>
               <circle cx="150" cy="112" r="4.5" fill="var(--ink)"/>
@@ -460,8 +460,8 @@
               <line id="string-right" x1="245" y1="112" x2="245" y2="140" stroke="var(--ink-muted)" stroke-width="1.6"/>
               <circle id="pan-left" cx="55" cy="152" r="22" fill="var(--pole-mindset)" fill-opacity="0.16" stroke="var(--pole-mindset)" stroke-width="2.4"/>
               <circle id="pan-right" cx="245" cy="152" r="22" fill="var(--pole-metodo)" fill-opacity="0.16" stroke="var(--pole-metodo)" stroke-width="2.4"/>
-              <text id="pan-left-txt" x="55" y="157" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-weight="700" font-size="15" fill="var(--pole-mindset)">0.0</text>
-              <text id="pan-right-txt" x="245" y="157" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-weight="700" font-size="15" fill="var(--pole-metodo)">0.0</text>
+              <text id="pan-left-txt" x="55" y="157" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-weight="700" font-size="13" fill="var(--pole-mindset)">0%</text>
+              <text id="pan-right-txt" x="245" y="157" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-weight="700" font-size="13" fill="var(--pole-metodo)">0%</text>
             </g>
           </svg>
           <div class="balance-labels">
@@ -476,7 +476,7 @@
         <p class="card-eyebrow">Los 6 frentes</p>
         <h2 class="card-title">Rosa ELIXIR</h2>
         <svg class="rose-fig" viewBox="0 0 320 320" role="img" aria-labelledby="rose-desc">
-          <desc id="rose-desc">Gráfico de rosa con seis pétalos, uno por cada frente del modelo ELIXIR; el radio de cada pétalo representa su puntaje promedio de 0 a 5.</desc>
+          <desc id="rose-desc">Gráfico de rosa con seis pétalos, uno por cada frente del modelo ELIXIR; el radio de cada pétalo representa su nivel de madurez de 0 % a 100 %.</desc>
           <g id="rose-grid" stroke="var(--line)" fill="none"></g>
           <g id="rose-petals"></g>
           <g id="rose-labels"></g>
@@ -1004,6 +1004,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
   function levelFor(avg){ for (var i=0;i<LEVELS.length;i++){ if (avg < LEVELS[i].max) return LEVELS[i]; } return LEVELS[LEVELS.length-1]; }
   function avgOf(list){ if (!list.length) return 0; return list.reduce(function(a,b){return a+b;},0) / list.length; }
+  // Los resultados se muestran en porcentaje: un puntaje 0-5 -> 0-100 %.
+  function pctOf(score){ return Math.round((Number(score) || 0) / 5 * 100) + "%"; }
 
   var SUBMISSIONS = [];
   try {
@@ -1229,7 +1231,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
     var pillarAvg = record.pillarAvg, overall = record.overall;
     var lvl = levelFor(overall);
-    document.getElementById("idx-value").textContent = overall.toFixed(2);
+    document.getElementById("idx-value").textContent = pctOf(overall);
     var badge = document.getElementById("idx-badge");
     badge.textContent = lvl.label;
     var tone = MTONES[lvl.n - 1];
@@ -1245,7 +1247,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     var diff = mindsetAvg - metodoAvg;
     var angleDeg = Math.max(-22, Math.min(22, diff * -14));
     var theta = angleDeg * Math.PI / 180;
-    var pivot = { x:150, y:112 }, L = 95;
+    var pivot = { x:150, y:100 }, L = 95;
     var left = { x: pivot.x - L*Math.cos(theta), y: pivot.y - L*Math.sin(theta) };
     var right = { x: pivot.x + L*Math.cos(theta), y: pivot.y + L*Math.sin(theta) };
 
@@ -1259,13 +1261,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     document.getElementById("pan-right").setAttribute("cx", right.x); document.getElementById("pan-right").setAttribute("cy", right.y + 42);
     document.getElementById("pan-left-txt").setAttribute("x", left.x); document.getElementById("pan-left-txt").setAttribute("y", left.y + 47);
     document.getElementById("pan-right-txt").setAttribute("x", right.x); document.getElementById("pan-right-txt").setAttribute("y", right.y + 47);
-    document.getElementById("pan-left-txt").textContent = mindsetAvg.toFixed(2);
-    document.getElementById("pan-right-txt").textContent = metodoAvg.toFixed(2);
+    document.getElementById("pan-left-txt").textContent = pctOf(mindsetAvg);
+    document.getElementById("pan-right-txt").textContent = pctOf(metodoAvg);
 
     document.querySelectorAll(".balance-pole .pv").forEach(function(n){ n.remove(); });
     var poles = document.querySelectorAll(".balance-pole");
-    var lv = document.createElement("div"); lv.className = "pv"; lv.style.color = "var(--pole-mindset)"; lv.textContent = mindsetAvg.toFixed(2);
-    var rv = document.createElement("div"); rv.className = "pv"; rv.style.color = "var(--pole-metodo)"; rv.textContent = metodoAvg.toFixed(2);
+    var lv = document.createElement("div"); lv.className = "pv"; lv.style.color = "var(--pole-mindset)"; lv.textContent = pctOf(mindsetAvg);
+    var rv = document.createElement("div"); rv.className = "pv"; rv.style.color = "var(--pole-metodo)"; rv.textContent = pctOf(metodoAvg);
     poles[0].insertBefore(lv, poles[0].firstChild); poles[1].insertBefore(rv, poles[1].firstChild);
 
     var verdict = document.getElementById("balance-verdict");
@@ -1304,7 +1306,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       petalsHtml += '<path d="' + wedgePath(minR, r, start, end) + '" fill="' + p.color + '" fill-opacity="0.82"></path>';
       var lp2 = polar(maxR + 20, mid);
       labelsHtml += '<text x="' + lp2.x.toFixed(2) + '" y="' + lp2.y.toFixed(2) + '" text-anchor="middle" dominant-baseline="middle" font-family="Fraunces, serif" font-weight="600" font-size="16" fill="' + p.color + '">' + p.letter + '</text>';
-      legendHtml += '<div class="rose-legend-item"><span class="dot" style="background:' + p.color + '"></span><span class="name">' + p.name + '</span><span class="val">' + score.toFixed(1) + '</span></div>';
+      legendHtml += '<div class="rose-legend-item"><span class="dot" style="background:' + p.color + '"></span><span class="name">' + p.name + '</span><span class="val">' + pctOf(score) + '</span></div>';
     });
     document.getElementById("rose-petals").innerHTML = petalsHtml;
     document.getElementById("rose-labels").innerHTML = labelsHtml;
@@ -1545,3 +1547,4 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
 </body>
 </html>
+
