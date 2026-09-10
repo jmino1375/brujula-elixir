@@ -55,6 +55,9 @@
 
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; }
+  /* En la pantalla de resultados se bloquea el "pull-to-refresh" del navegador:
+     al hacer scroll hacia abajo desde el tope, la página ya no se recarga. */
+  html.results-locked, html.results-locked body{ overscroll-behavior-y: none; }
   body{
     background: var(--bg);
     color: var(--ink);
@@ -1086,7 +1089,20 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       btnBack.style.opacity = 1; btnBack.style.pointerEvents = "auto";
       btnNext.textContent = (pIdx === PILLARS.length - 1) ? "Ver resultados" : "Siguiente";
     }
+
+    setResultsLock(id === "results");
     refreshNav();
+  }
+
+  // En la pantalla de resultados se bloquea la salida accidental: se desactiva
+  // el "pull-to-refresh" (via CSS) y cualquier recarga / cierre / retroceso del
+  // navegador pide confirmacion. Salir con "Volver a responder" (btn-restart) NO
+  // dispara el aviso, porque es navegacion interna, no recarga de pagina.
+  function blockUnload(e){ e.preventDefault(); e.returnValue = ""; }
+  function setResultsLock(on){
+    document.documentElement.classList.toggle("results-locked", on);
+    if (on) window.addEventListener("beforeunload", blockUnload);
+    else window.removeEventListener("beforeunload", blockUnload);
   }
 
   function refreshNav(){
@@ -1351,6 +1367,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   }
   function openAdmin(){
     adminReturnIndex = state.index;
+    setResultsLock(false);
     Object.keys(screenEls).forEach(function(k){ screenEls[k].classList.toggle("is-active", k === "admin"); });
     topbar.classList.remove("has-progress");
     progressWrap.style.display = "none";
@@ -1529,3 +1546,4 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
 </body>
 </html>
+
