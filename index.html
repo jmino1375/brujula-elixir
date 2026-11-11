@@ -948,7 +948,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   //      https://TU-SITIO/brujula-elixir.html#admin=TU_CLAVE
   //  y solo vive ademas dentro del Apps Script.
   var CONFIG = {
-    ENDPOINT: "https://script.google.com/macros/s/AKfycbzksUTZbldKHAw79Cszy0LEJu025XTdSC7Cnabox9IyUDQXiLVTzhRyWDUzLImVVh0zGQ/exec"
+    ENDPOINT: "https://script.google.com/macros/s/AKfycbwAmotGC_2LvwuajMzS-t8v9AU_TaStsL1VrUw43sC9f1XSdDvBPAGZI4hCBmiciAXblA/exec"
   };
 
   var PILLARS = [
@@ -1399,7 +1399,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         '<div class="admin-row">' +
           '<div class="admin-row-top">' +
             '<span class="admin-row-date">' + fecha + '</span>' +
-            '<span class="idx-badge" style="margin:0;background:' + tone + ';color:' + ((lvl.n>=4)?'#fff':'var(--m-ink-light)') + '">' + r.overall.toFixed(2) + ' · ' + lvl.label.replace(/^Nivel \d+ · /, '') + '</span>' +
+            '<span class="idx-badge" style="margin:0;background:' + tone + ';color:' + ((lvl.n>=4)?'#fff':'var(--m-ink-light)') + '">' + pctOf(r.overall) + ' · ' + lvl.label.replace(/^Nivel \d+ · /, '') + '</span>' +
           '</div>' +
           '<div class="admin-row-org">' + (r.org || "—") + '</div>' +
           '<div class="admin-row-who">' + (r.name || "—") + (r.cargo ? " · " + r.cargo : "") + '</div>' +
@@ -1414,15 +1414,17 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     return v;
   }
   function buildCsv(){
-    var headers = ["Fecha","Organización","Nombre completo","Cargo","Teléfono","Cultura objetivo"]
+    // Mismas columnas que la hoja de Google (puntajes 0-5 -> % como en el reporte).
+    function pctCell(v){ return (typeof v === "number" && isFinite(v)) ? Math.round(v / 5 * 100) : ""; }
+    var headers = ["Fecha","Organización","Nombre completo","Cargo","Teléfono"]
       .concat(QUESTIONS.map(function(q){ return q.code; }))
-      .concat(PILLARS.map(function(p){ return "Prom " + p.short; }))
-      .concat(["Índice general","Nivel","Prom Mindset","Prom Método"]);
+      .concat(PILLARS.map(function(p){ return p.name + " (%)"; }))
+      .concat(["Índice general (%)","Nivel","Mindset (%)","Método (%)"]);
     var rows = SUBMISSIONS.map(function(r){
-      var row = [r.ts, r.org, r.name, r.cargo, r.phone, r.culture || ""];
+      var row = [r.ts, r.org, r.name, r.cargo, r.phone];
       QUESTIONS.forEach(function(q){ row.push(r.answers[q.code]); });
-      PILLARS.forEach(function(p){ row.push((r.pillarAvg[p.key]||0).toFixed(2)); });
-      row.push(r.overall.toFixed(2), r.levelLabel, r.mindsetAvg.toFixed(2), r.metodoAvg.toFixed(2));
+      PILLARS.forEach(function(p){ row.push(pctCell(r.pillarAvg[p.key])); });
+      row.push(pctCell(r.overall), r.levelLabel, pctCell(r.mindsetAvg), pctCell(r.metodoAvg));
       return row;
     });
     var lines = [headers.map(csvEscape).join(",")].concat(rows.map(function(r){ return r.map(csvEscape).join(","); }));
@@ -1546,4 +1548,5 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
 </body>
 </html>
+
 
